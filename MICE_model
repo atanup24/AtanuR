@@ -1,0 +1,21 @@
+# Load necessary library
+library(mice)
+
+# Read the CSV file into R (Replace 'your_file.csv' with your actual file path)
+data <- read.csv("Your_file.csv")
+
+# Display summary statistics of the dataset
+summary(data)
+
+# Impute missing values using mice
+imputed_data <- mice(data, method = "pmm", m = 12)  # m is the number of imputations
+
+# Complete the imputation process
+completed_data <- complete(imputed_data)
+
+# Write the imputed data to a new CSV file (Replace 'imputed_data.csv' with your desired file name)
+write.csv(completed_data, file = "Your_file.csv",
+          row.names = FALSE)
+
+# View the completed dataset with imputed values
+print(completed_data)
