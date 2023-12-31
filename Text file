@@ -6,3 +6,30 @@ cleaned_data <- data[complete.cases(data), ]
 
 # Save the cleaned data to a new CSV file or overwrite the existing one
 write.csv(cleaned_data, "Your_file.csv", row.names = FALSE)
+# Load necessary libraries
+library(dplyr)
+
+# Read the CSV file
+data <- read.csv("E:/SHLD/VGPM dataset/Cleaned_data_NPP.csv")
+
+# Function to perform Min-Max normalization
+min_max_normalize <- function(x) {
+  if (length(unique(x)) > 1) {
+    return ((x - min(x)) / (max(x) - min(x)))
+  } else {
+    return (rep(0, length(x)))
+  }
+}
+
+# Normalize 'lat' and 'lon' columns using Min-Max normalization
+data$lat_normalized <- min_max_normalize(data$lat)
+data$lon_normalized <- min_max_normalize(data$lon)
+
+# Normalize 'NPP' column using Min-Max normalization
+data$NPP_normalized <- min_max_normalize(data$NPP)
+
+# Save the normalized data to a new CSV file
+write.csv(data, "E:/SHLD/VGPM dataset/normalized_data.csv", row.names = FALSE)
+View(data)
+# Display the head of the normalized dataset
+head(data)
