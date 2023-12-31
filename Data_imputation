@@ -1,0 +1,25 @@
+# Load necessary library
+library(missForest)
+
+# Read the CSV file into R (Replace 'your_file.csv' with your actual file path)
+data <- read.csv("your_file.csv")
+# Convert a character column to factor (Replace 'Spot.name' with the name of your character column)
+data$Spot.name <- as.factor(data$Spot.name)
+
+# Impute missing values using missForest
+imputed_data_missForest <- missForest(data)
+data$Tide <- as.numeric(data$Tide)
+# View the completed dataset with imputed values
+print(imputed_data_missForest$ximp)
+
+# Write the imputed data to a new CSV file (Replace 'imputed_data_missForest.csv' with your desired file name)
+write.csv(imputed_data_missForest$ximp, file = "C:/Users/atanu/OneDrive/Desktop
+          /imputed_data_missForest.csv", row.names = FALSE)
+# Impute missing values using missForest
+imputed_data_missForest <- missForest(data$pH)
+
+# View the completed dataset with imputed values
+print(imputed_data_missForest$ximp)
+
+# Write the imputed data to a new CSV file (Replace 'imputed_data_missForest.csv' with your desired file name)
+write.csv(imputed_data_missForest$ximp, file = "imputed_data_missForest.csv", row.names = FALSE)
