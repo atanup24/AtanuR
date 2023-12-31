@@ -1,0 +1,28 @@
+# Load the necessary libraries
+library(ggplot2)
+library(readr)
+
+# Load the CSV data
+data <- read_csv("Timseries_data_cbleach.csv")
+
+# Combine the "Year" and "Month" columns into a single date column
+data$Date <- as.Date(paste(data$Year, data$Month, "01", sep="-"))
+
+# Create a time series plot
+ggplot(data, aes(x = Date)) +
+  geom_line(aes(y = Coral_Bleach, color = "Coral Bleach"), size = 1) +
+  geom_line(aes(y = fco2_norm, color = "fco2_norm"), size = 1) +
+  geom_line(aes(y = pH_norm, color = "pH_norm"), size = 1) +
+  geom_line(aes(y = Salinity_norm, color = "Salinity_norm"), size = 1) +
+  geom_line(aes(y = SSTA_norm, color = "SSTA_norm"), size = 1) +
+  geom_line(aes(y = DO_norm, color = "DO_norm"), size = 1) +
+  geom_line(aes(y = Total_Alkalinity, color = "Total Alkalinity"), size = 1) +
+  geom_line(aes(y = tco2_norm, color = "tco2_norm"), size = 1) +
+  labs(x = "Date", y = "Value", color = "Legend") +
+  scale_color_manual(values = c("Coral Bleach" = "blue", "fco2_norm" = "red",
+                                "pH_norm" = "green", "Salinity_norm" = "purple",
+                                "SSTA_norm" = "orange", "DO_norm" = "brown",
+                                "Total Alkalinity" = "pink", "tco2_norm" = "gray")) +
+  theme_minimal() +
+  theme(legend.position = "top") +
+  ggtitle("Time Series Plot of Your Data")
