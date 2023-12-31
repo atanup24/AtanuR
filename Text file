@@ -1,0 +1,8 @@
+# Read the CSV dataset
+data <- read.csv("Your_file")  # Replace "your_dataset.csv" with the actual file path
+
+# Remove rows with blank cells
+cleaned_data <- data[complete.cases(data), ]
+
+# Save the cleaned data to a new CSV file or overwrite the existing one
+write.csv(cleaned_data, "Your_file.csv", row.names = FALSE)
