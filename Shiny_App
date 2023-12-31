@@ -1,0 +1,59 @@
+# Load required libraries
+library(shiny)
+library(forecast)
+
+# Define UI
+ui <- fluidPage(
+  titlePanel("Time Series Forecasting App"),
+  sidebarLayout(
+    sidebarPanel(
+      fileInput("file", "Choose a CSV file",
+                accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
+      textInput("date_col", "Enter the date column name", value = "date"),
+      textInput("data_col", "Enter the data column name", value = "value"),
+      selectInput("method", "Select forecasting method",
+                  choices = c("ETS", "ARIMA"),
+                  selected = "ETS"),
+      numericInput("horizon", "Forecast horizon:", 12),
+      actionButton("submit", "Generate Forecast")
+    ),
+    mainPanel(
+      plotOutput("plot")
+    )
+  )
+)
+
+# Define server
+server <- function(input, output) {
+  
+  # Read the uploaded file
+  data <- reactive({
+    req(input$file)
+    read.csv(input$file$datapath)
+  })
+  
+  # Generate forecast
+  forecast_data <- reactive({
+    req(input$submit)
+    
+    ts_data <- ts(data()[, input$data_col], start = 1, end = nrow(data()), frequency = 12)  # Assuming monthly data
+    
+    if (input$method == "ETS") {
+      forecast_model <- forecast(ets(ts_data), h = input$horizon)
+    } else {
+      forecast_model <- forecast(auto.arima(ts_data), h = input$horizon)
+    }
+    
+    return(forecast_model)
+  })
+  
+  # Plot the forecast
+  output$plot <- renderPlot({
+    req(forecast_data())
+    plot(forecast_data(), main = "Time Series Forecast")
+  })
+  
+}
+
+# Run the Shiny app
+shinyApp(ui, server)
