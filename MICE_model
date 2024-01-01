@@ -29,3 +29,61 @@ impute_model <- mice(data,
 
 imputed_data <- complete(impute_model, 1)  # Use the first imputed dataset
 write.csv(imputed_data, file = "Imputed_River_data.csv", row.names = FALSE)
+
+# Load necessary libraries
+library(mice)
+library(ggplot2)
+
+# Perform the imputation
+impute_model <- mice(data, 
+                     method = "pmm",
+                     m = 5  # Number of imputed datasets to create
+)
+
+# Obtain the imputed datasets
+imputed_data <- complete(impute_model, "long", include = TRUE)
+
+# Specify the variable you want to visualize (e.g., Temp_mean)
+variable_to_plot <- "Temp_mean"
+
+# Create a density plot for the imputed values
+ggplot(data = imputed_data, aes(x = .imp)) +
+  geom_density(fill = "blue", alpha = 0.5) +
+  labs(title = paste("Distribution of", variable_to_plot, " (Imputed Data)"),
+       x = variable_to_plot) +
+  theme_minimal()
+
+
+
+
+
+# Install mice package if you haven't already
+# install.packages("mice")
+
+# Load necessary libraries
+library(mice)
+
+# Read the CSV file
+data <- read.csv("E:/SHLD/NPP data/Python/normalized_phytoplankton_data.csv")
+
+# Checking for missing values in 'PIC_POC_ratio' column
+print("Missing values in PIC_POC_ratio before imputation:")
+print(sum(is.na(data$PIC_POC_ratio)))
+
+# Checking for missing values in 'PIC_POC_ratio' column
+print("Missing values in PIC_POC_ratio before imputation:")
+print(sum(is.na(data$PIC_POC_ratio)))
+
+# Creating the imputation model for PIC_POC_ratio
+data_impute <- mice(data, method = 'pmm')
+
+# Perform the imputation for the entire dataset
+imputed_data <- complete(data_impute)
+
+# Checking for missing values after imputation
+print("Missing values in PIC_POC_ratio after imputation:")
+print(sum(is.na(imputed_data$PIC_POC_ratio)))
+
+# View the imputed dataset
+head(imputed_data)
+write.csv(imputed_data, "imputed_normalized_phytoplankton_data.csv", row.names = FALSE)
