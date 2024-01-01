@@ -1,0 +1,23 @@
+# Load necessary library
+library(mice)
+
+# Read the CSV file into R (Replace 'your_file.csv' with your actual file path)
+data <- read.csv("C:/Users/atanupanja/Desktop/CPCB_salinity.csv", header = TRUE)  # Adjust 'header' as needed
+
+# Select columns for imputation
+columns_to_impute <- c("Chloride", "Salinity")
+
+# Impute missing values for 'Chloride' and 'Salinity' using predictive mean matching in mice
+imputed_data <- mice(data[columns_to_impute], method = "pmm", m = 5)
+
+# Complete the imputation process
+completed_data <- complete(imputed_data)
+
+# Merge the imputed columns with the original dataset
+data[columns_to_impute] <- completed_data
+
+# Write the dataset with imputed values to a new CSV file 
+write.csv(data, file = "C:/Users/atanupanja/Desktop/imputed_data_mice.csv", row.names = FALSE)
+
+# View the completed dataset with imputed values
+print(data)
