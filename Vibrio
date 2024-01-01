@@ -165,3 +165,39 @@ combined_plots <- grid.arrange(boxplot_vibrio, barplot_total_col, nrow = 2)
 
 # Show the combined plot
 combined_plots
+
+
+# Install 'mice' package if not already installed
+# install.packages("mice")
+
+library(mice)
+
+# Read the CSV file
+data <- read.csv("Coliform_data.csv")
+
+# Display basic information about the dataset
+str(data)
+
+# Define columns for imputation
+columns_to_impute <- c("Fecal_col", "Tot_col")
+
+# Remove exceptional high values (outliers)
+threshold <- 100000  # Adjust this threshold as needed
+for (col in columns_to_impute) {
+  q3 <- quantile(data[[col]], 0.75, na.rm = TRUE)
+  q1 <- quantile(data[[col]], 0.25, na.rm = TRUE)
+  iqr <- q3 - q1
+  upper_bound <- q3 + threshold * iqr
+  data[[col]][data[[col]] > upper_bound] <- NA
+}
+
+# Imputation using mice with predictive mean matching
+imp <- mice(data, method = 'pmm', m = 5)  # 'm' indicates the number of imputations
+
+# Complete the imputation process
+imputed_data <- complete(imp)
+
+# Save the imputed dataset to a new CSV file
+write.csv(imputed_data, file = "Imputed_PMM_Coliform_data_excluding_outliers.csv", row.names = FALSE)
+
+cat("\nPMM Imputation excluding outliers completed. Updated dataset saved to 'Imputed_PMM_Coliform_data_excluding_outliers.csv'.\n")
