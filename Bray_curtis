@@ -1,0 +1,42 @@
+# Load required libraries
+library(vegan)  # For ecological analysis
+library(readr)  # For reading data
+
+# Read the data
+data <- read_csv("C:/Users/atanupanja/Desktop/Coral_biodiversity.csv")  # Replace "your_data.csv" with your file name
+# Extract abundance columns for different depth ranges (assuming columns 'S1 (0-20m)', 'S2 (25-45m)', 'S3 (50-70m)', 'S4 (75-95m)' are the abundance counts)
+abundance_data <- data[, c("S1 (0-20m)", "S2 (25-45m)", "S3 (50-70m)", "S4 (75-95m)")]
+
+# Check for missing values and handle them
+abundance_data[is.na(abundance_data)] <- 0  # Replace NA values with 0 or use other imputation methods if appropriate
+
+# Calculate Bray-Curtis dissimilarity matrix
+bray_curtis_dist <- vegdist(abundance_data, method = "bray")
+
+# Check for missing values
+any(is.na(bray_curtis_dist))
+
+# Replace missing values with zeros
+bray_curtis_dist[is.na(bray_curtis_dist)] <- 0
+
+# Check for constant rows or columns
+all_zero_rows <- which(rowSums(bray_curtis_dist) == 0)
+all_zero_cols <- which(colSums(bray_curtis_dist) == 0)
+
+# Remove rows and columns with all zeros
+bray_curtis_dist <- bray_curtis_dist[-all_zero_rows, ]
+bray_curtis_dist <- bray_curtis_dist[, -all_zero_cols]
+
+# Recalculate NMDS
+nmds <- metaMDS(bray_curtis_dist)
+
+
+
+# Perform NMDS using Bray-Curtis dissimilarity
+nmds <- metaMDS(bray_curtis_dist)
+# Plot NMDS ordination
+plot(nmds, type = "n")  # Create an empty plot
+points(nmds, col = "blue")  # Add points for coordinates with colors
+
+# Add labels or annotations for coordinates
+text(nmds, labels = paste("Lat:", data$Latitude, "Lon:", data$Longitude), cex = 0.8, pos = 3)
