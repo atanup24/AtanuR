@@ -128,3 +128,40 @@ if (correlation_test$p.value < alpha) {
   print("Fail to reject the null hypothesis")
   print("There is no significant correlation between Vibrio and Fecal Coliform counts")
 }
+
+
+############### Vibrio ANOVA ################
+# Load the data
+data <- read.csv("Imputed_River_data_1.csv")
+
+# Checking the structure of the dataset
+str(data)
+
+# Perform ANOVA for Predicted_vibrio_norm among different states
+anova_vibrio <- aov(Predicted_vibrio_norm ~ STATE, data = data)
+summary(anova_vibrio)
+
+# Perform ANOVA for Total_col_norm among different states
+anova_total_col <- aov(Total_col_norm ~ STATE, data = data)
+summary(anova_total_col)
+
+library(ggplot2)
+library(gridExtra)
+# Load the data
+data <- read.csv("Imputed_River_data_1.csv")
+
+# Boxplot for Predicted_vibrio_norm across different states
+boxplot_vibrio <- ggplot(data, aes(x = STATE, y = Predicted_vibrio_norm)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Predicted Vibrio CFU across States", x = "States", y = "Predicted Vibrio CFU")
+
+# Bar plot for Total_col_norm across different states
+barplot_total_col <- ggplot(data, aes(x = STATE, y = Total_col_norm, fill = STATE)) +
+  geom_bar(stat = "summary", fun = "mean") +
+  labs(title = "Mean Total Coliform CFU across States", x = "States", y = "Mean Total Coliform CFU")
+
+# Combine plots using grid.arrange
+combined_plots <- grid.arrange(boxplot_vibrio, barplot_total_col, nrow = 2)
+
+# Show the combined plot
+combined_plots
