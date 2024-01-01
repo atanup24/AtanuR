@@ -1,0 +1,130 @@
+# Load necessary libraries
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stats)
+
+# Load the data from CSV
+data <- read_csv("Imputed_River_data_1.csv")
+
+# Check the structure of the data
+str(data)
+
+# Perform ANOVA or appropriate statistical tests for each combination of CFU counts and state
+# Assuming Predicted_vibrio_norm and Total_col_norm are numerical columns representing CFU counts
+
+# For Predicted_vibrio_norm
+vibrio_anova <- aov(Predicted_vibrio_norm ~ STATE, data = data)
+summary(vibrio_anova)
+
+# For Total_col_norm
+total_col_anova <- aov(Total_col_norm ~ STATE, data = data)
+summary(total_col_anova)
+
+
+
+
+# Load necessary libraries
+library(readr)
+library(dplyr)
+library(stats)
+
+# Load the data from CSV
+data <- read_csv("Imputed_River_data_1.csv")
+
+# Check the structure of the data
+str(data)
+
+# Perform a paired t-test or Wilcoxon signed-rank test to compare Vibrio and Fecal Coliform counts
+# Assuming the data is paired by location or some other relevant pairing variable
+
+# Paired t-test
+paired_ttest <- t.test(data$Predicted_vibrio_norm, data$Fecal_col_norm, paired = TRUE)
+print(paired_ttest)
+
+# Wilcoxon signed-rank test (non-parametric alternative)
+wilcox_test <- wilcox.test(data$Predicted_vibrio_norm, data$Fecal_col_norm, paired = TRUE)
+print(wilcox_test)
+
+# Set the significance level (alpha)
+alpha <- 0.05
+
+# Print the accepted hypothesis based on the p-value
+print("Paired t-test results:")
+if (paired_ttest$p.value < alpha) {
+  print("Reject the null hypothesis")
+  print("There is a significant difference between Vibrio and Fecal Coliform counts")
+} else {
+  print("Fail to reject the null hypothesis")
+  print("There is no significant difference between Vibrio and Fecal Coliform counts")
+}
+
+print("Wilcoxon signed-rank test results:")
+if (wilcox_test$p.value < alpha) {
+  print("Reject the null hypothesis")
+  print("There is a significant difference between Vibrio and Fecal Coliform counts")
+} else {
+  print("Fail to reject the null hypothesis")
+  print("There is no significant difference between Vibrio and Fecal Coliform counts")
+}
+
+# Load necessary libraries
+library(readr)
+library(dplyr)
+
+# Load the data from CSV
+data <- read_csv("Imputed_River_data_1.csv")
+
+# Check the structure of the data
+str(data)
+
+# Perform correlation test (Pearson or Spearman)
+correlation_test <- cor.test(data$Predicted_vibrio_norm, data$Total_col_norm)
+
+# Print the test results
+print("Correlation test results:")
+print(paste("Correlation coefficient:", correlation_test$estimate))
+print(paste("p-value:", correlation_test$p.value))
+
+# Set the significance level (alpha)
+alpha <- 0.05
+
+# Check if the correlation is significant based on the p-value
+if (correlation_test$p.value < alpha) {
+  print("Reject the null hypothesis")
+  print("There is a significant correlation between Vibrio and Total Coliform counts")
+} else {
+  print("Fail to reject the null hypothesis")
+  print("There is no significant correlation between Vibrio and Total Coliform counts")
+}
+
+
+# Load necessary libraries
+library(readr)
+library(dplyr)
+
+# Load the data from CSV
+data <- read_csv("Imputed_River_data_1.csv")
+
+# Check the structure of the data
+str(data)
+
+# Perform correlation test (Pearson or Spearman)
+correlation_test <- cor.test(data$Predicted_vibrio_norm, data$Fecal_col_norm)
+
+# Print the test results
+print("Correlation test results:")
+print(paste("Correlation coefficient:", correlation_test$estimate))
+print(paste("p-value:", correlation_test$p.value))
+
+# Set the significance level (alpha)
+alpha <- 0.05
+
+# Check if the correlation is significant based on the p-value
+if (correlation_test$p.value < alpha) {
+  print("Reject the null hypothesis")
+  print("There is a significant correlation between Vibrio and Fecal Coliform counts")
+} else {
+  print("Fail to reject the null hypothesis")
+  print("There is no significant correlation between Vibrio and Fecal Coliform counts")
+}
