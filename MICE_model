@@ -19,3 +19,13 @@ write.csv(completed_data, file = "Your_file.csv",
 
 # View the completed dataset with imputed values
 print(completed_data)
+####################################
+library(mice)
+data <- read.csv("River_data.csv")
+impute_model <- mice(data, 
+                     method = "pmm",
+                     m = 5  # Number of imputed datasets to create
+)
+
+imputed_data <- complete(impute_model, 1)  # Use the first imputed dataset
+write.csv(imputed_data, file = "Imputed_River_data.csv", row.names = FALSE)
