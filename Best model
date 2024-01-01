@@ -1,0 +1,103 @@
+# Load required libraries
+library(tidyverse)
+library(keras)
+library(tfruns)
+
+# Load your dataset
+data <- read.csv("NPP_jan.csv")
+
+# Handle missing data: Impute missing values with means
+data$lat[is.na(data$lat)] <- mean(data$lat, na.rm = TRUE)
+data$lon[is.na(data$lon)] <- mean(data$lon, na.rm = TRUE)
+data$npp[is.na(data$npp)] <- mean(data$npp, na.rm = TRUE)
+
+# Normalize the data
+data_normalized <- data %>%
+  mutate(lat = (lat - mean(lat)) / sd(lat),
+         lon = (lon - mean(lon)) / sd(lon),
+         npp = (npp - mean(npp)) / sd(npp))
+
+# Split the dataset into training and testing sets
+set.seed(123)
+split_ratio <- 0.8
+
+sample_size <- floor(split_ratio * nrow(data_normalized))
+train_indices <- sample(1:nrow(data_normalized), size = sample_size)
+
+train_data <- data_normalized[train_indices, ]
+test_data <- data_normalized[-train_indices, ]
+
+# Define the model for hyperparameter tuning
+def_model <- function(units, dropout, learning_rate) {
+  model <- keras_model_sequential()
+  
+  model %>%
+    layer_dense(units = units, activation = "relu", input_shape = c(2)) %>%
+    layer_dropout(rate = dropout)
+  
+  model %>%
+    layer_dense(units = units, activation = "relu") %>%
+    layer_dropout(rate = dropout)
+  
+  model %>%
+    layer_dense(units = 1)
+  
+  model %>% compile(
+    loss = "mean_squared_error",
+    optimizer = optimizer_adam(learning_rate = learning_rate),
+    metrics = list("mean_absolute_error")
+  )
+  
+  return(model)
+}
+
+# Define a grid of hyperparameters
+hyperparameters_grid <- expand.grid(
+  units = c(16, 32, 64, 128),
+  dropout = seq(0.3, 0.7, by = 0.1),
+  learning_rate = seq(1e-4, 1e-2, by = 1e-3)
+)
+
+# Perform hyperparameter tuning
+best_validation_loss <- Inf
+best_model <- NULL
+
+for (i in 1:nrow(hyperparameters_grid)) {
+  units <- hyperparameters_grid[i, "units"]
+  dropout <- hyperparameters_grid[i, "dropout"]
+  learning_rate <- hyperparameters_grid[i, "learning_rate"]
+  
+  model <- def_model(units, dropout, learning_rate)
+  history <- model %>% fit(
+    x = as.matrix(train_data[, c("lat", "lon")]),
+    y = as.vector(train_data$npp),
+    epochs = 50,
+    batch_size = 32,
+    validation_split = 0.2,
+    verbose = 0
+  )
+  
+  validation_loss <- min(history$val_loss)
+  
+  if (validation_loss < best_validation_loss) {
+    best_validation_loss <- validation_loss
+    best_model <- model
+  }
+}
+
+# Train the best model
+history <- best_model %>% fit(
+  x = as.matrix(train_data[, c("lat", "lon")]),
+  y = as.vector(train_data$npp),
+  epochs = 100,
+  batch_size = 32,
+  validation_split = 0.2
+)
+
+# Evaluate the best model on the test dataset
+evaluation <- best_model %>% evaluate(
+  x = as.matrix(test_data[, c("lat", "lon")]),
+  y = as.vector(test_data$npp)
+)
+
+cat("Mean Absolute Error on Test Data:", evaluation$mean_absolute_error, "\n")
