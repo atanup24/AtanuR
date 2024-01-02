@@ -1,0 +1,224 @@
+# Load necessary libraries
+library(changepoint)
+library(ggplot2)
+
+# Assuming you have a dataframe 'data' with columns: 'latitude', 'longitude', 'npp_value'
+# 'npp_value' contains the Net Primary Productivity data
+
+# Perform regime shift analysis on the entire NPP dataset
+cpt <- cpt.mean(data$NPP, method = "PELT")
+cpt_points <- cpts(cpt)
+
+# Plotting the NPP data with detected change points
+p<-ggplot(data) +
+  geom_point(aes(x = lon, y = lat, color = NPP)) + # Spatial plot
+  labs(title = "Net Primary Productivity (NPP) Spatial Analysis", 
+       x = "Longitude", y = "Latitude") +
+  theme_minimal()
+
+# Create a column in the dataframe to indicate change points
+data$is_change_point <- ifelse(1:length(data$NPP) %in% cpt_points, 
+                               "Change Point", "Regular Point")
+
+# Plotting the NPP data with detected change points
+p<-ggplot(data) +
+  geom_point(aes(x = lon, y = lat, color = is_change_point)) + # Spatial plot with different colors
+  labs(title = "Net Primary Productivity (NPP) Spatial Analysis", 
+       x = "Longitude", y = "Latitude", color = "Point Type") +
+  theme_minimal() +
+  scale_color_manual(values = c("blue", "red"),
+                     labels = c("Regular Point", "Change Point")) # Define colors for points
+
+# You can also visualize the detected change points on a map if you have geographic data
+# (consider using suitable mapping libraries like ggmap, leaflet, or others)
+# Load necessary libraries
+library(ggplot2)
+
+# Assuming 'npp_data' is your dataset with columns: 'npp_value' and 'is_change_point'
+
+# Split the NPP data into two groups: before and after change points
+npp_before <- data$NPP[data$is_change_point == "Regular Point"]
+npp_after <- data$NPP[data$is_change_point == "Change Point"]
+
+# Combine the data into a data frame suitable for boxplot
+comparison_data <- data.frame(
+  NPP_Type = factor(c(rep("Before Regime Shift", length(npp_before)), rep("After Regime Shift", length(npp_after)))),
+  NPP_Value = c(npp_before, npp_after)
+)
+
+# Create a boxplot to compare NPP before and after regime shifts
+ggplot(comparison_data, aes(x = NPP_Type, y = NPP_Value, fill = NPP_Type)) +
+  geom_boxplot() +
+  labs(
+    title = "Comparison of Net Primary Productivity Before and After Regime Shifts",
+    x = "NPP Type",
+    y = "Net Primary Productivity (NPP) Value"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("lightblue", "lightgreen"))  # Define boxplot fill colors
+
+# Combine the data into a data frame suitable for violin plot
+violin_data <- data.frame(
+  NPP_Type = factor(c(rep("Before Regime Shift", length(npp_before)), 
+                      rep("After Regime Shift", length(npp_after)))),
+  NPP_Value = c(npp_before, npp_after)
+)
+
+
+# Create a violin plot to compare NPP before and after regime shifts
+ggplot(violin_data, aes(x = NPP_Type, y = NPP_Value, fill = NPP_Type)) +
+  geom_violin(trim = FALSE) +
+  labs(
+    title = "Comparison of Net Primary Productivity Before and After Regime Shifts",
+    x = "NPP Type",
+    y = "Net Primary Productivity (NPP) Value"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("lightblue", "lightgreen"))  # Define violin plot fill colors
+
+
+# Summary statistics for NPP before regime shifts
+summary_before <- summary(npp_before)
+mean_before <- mean(npp_before)
+sd_before <- sd(npp_before)
+median_before <- median(npp_before)
+q25_before <- quantile(npp_before, probs = 0.25)
+q75_before <- quantile(npp_before, probs = 0.75)
+
+# Summary statistics for NPP after regime shifts
+summary_after <- summary(npp_after)
+mean_after <- mean(npp_after)
+sd_after <- sd(npp_after)
+median_after <- median(npp_after)
+q25_after <- quantile(npp_after, probs = 0.25)
+q75_after <- quantile(npp_after, probs = 0.75)
+
+# Display summary statistics
+cat("Summary Statistics for Net Primary Productivity (NPP) before regime shifts:\n")
+cat("Mean:", mean_before, "\n")
+cat("Standard Deviation:", sd_before, "\n")
+cat("Median:", median_before, "\n")
+cat("25th Percentile:", q25_before, "\n")
+cat("75th Percentile:", q75_before, "\n")
+
+cat("\nSummary Statistics for Net Primary Productivity (NPP) after regime shifts:\n")
+cat("Mean:", mean_after, "\n")
+cat("Standard Deviation:", sd_after, "\n")
+cat("Median:", median_after, "\n")
+cat("25th Percentile:", q25_after, "\n")
+cat("75th Percentile:", q75_after, "\n")
+
+# Split the NPP data into two groups: before and after change points
+npp_before <- data$NPP[data$is_change_point == "Regular Point"]
+npp_after <- data$NPP[data$is_change_point == "Change Point"]
+
+# Filter out missing values if present
+npp_before <- na.omit(data$NPP[data$is_change_point == "Regular Point"])
+npp_after <- na.omit(data$NPP[data$is_change_point == "Change Point"])
+
+# Ensure 'npp_before' and 'npp_after' have the same length for analysis
+min_length <- min(length(npp_before), length(npp_after))
+
+# Trim the longer vector to match the length of the shorter vector
+npp_before <- npp_before[1:min_length]
+npp_after <- npp_after[1:min_length]
+
+
+
+
+# Perform a paired t-test
+t_test_result <- t.test(npp_before, npp_after, paired = TRUE)
+
+# Display the t-test results
+cat("Paired t-test results:\n")
+cat("======================================\n")
+cat("Mean NPP before regime shift:", mean(npp_before), "\n")
+cat("Mean NPP after regime shift:", mean(npp_after), "\n")
+cat("\n")
+cat("t-statistic:", t_test_result$statistic, "\n")
+cat("Degrees of freedom:", t_test_result$parameter, "\n")
+cat("p-value:", t_test_result$p.value, "\n")
+cat("======================================\n")
+
+# Interpret the p-value to determine statistical significance
+if (t_test_result$p.value < 0.05) {
+  cat("The difference in NPP before and after regime shifts is statistically significant (p < 0.05).\n")
+} else {
+  cat("There is no statistically significant difference in NPP before and after regime shifts (p >= 0.05).\n")
+}
+# Combine the data into a data frame suitable for plotting
+combined_data <- data.frame(
+  NPP_Type = factor(c(rep("Before Regime Shift", length(npp_before)), rep("After Regime Shift", length(npp_after)))),
+  NPP_Value = c(npp_before, npp_after)
+)
+# Create a boxplot to compare NPP before and after regime shifts
+plot <- ggplot(combined_data, aes(x = NPP_Type, y = NPP_Value, fill = NPP_Type)) +
+  geom_boxplot() +
+  labs(
+    title = "Comparison of Net Primary Productivity Before and After Regime Shifts",
+    x = "NPP Type",
+    y = "Net Primary Productivity (NPP) Value"
+  ) +
+  theme_minimal() +
+  scale_fill_manual(values = c("lightblue", "lightgreen"))  # Define boxplot fill colors
+
+# Perform t-test
+t_test_result <- t.test(npp_before, npp_after, paired = TRUE)
+
+# Add significance asterisk to the plot if p-value is significant
+if (t_test_result$p.value < 0.05) {
+  plot <- plot + annotate("text", x = 1.5, y = max(combined_data$NPP_Value), label = "*", size = 6)
+}
+
+# Display the plot
+plot
+
+
+
+# Perform t-test
+t_test_result <- t.test(npp_before, npp_after, paired = TRUE)
+
+# Add significance asterisk to the plot if p-value is significant
+if (t_test_result$p.value < 0.05) {
+  plot <- plot + annotate("text", x = 1.5, y = max(combined_data$NPP_Value), label = "*", size = 6)
+}
+
+# Display the plot
+plot
+
+# Filter out missing values if present
+npp_before <- na.omit(data$NPP[data$is_change_point == "Regular Point"])
+npp_after <- na.omit(data$NPP[data$is_change_point == "Change Point"])
+# Print lengths for debugging
+cat("Length of npp_before:", length(npp_before), "\n")
+cat("Length of npp_after:", length(npp_after), "\n")
+
+# Check unique values in 'is_change_point' for further investigation
+unique_values <- unique(data$is_change_point)
+cat("Unique values in 'is_change_point':", unique_values, "\n")
+
+# Check if both vectors have the same length
+if (length(npp_before) != length(npp_after)) {
+  cat("The lengths of 'npp_before' and 'npp_after' are different. Please ensure they have the same length.")
+} else {
+  # Perform a paired t-test
+  t_test_result <- t.test(npp_before, npp_after, paired = TRUE)
+  
+  # Display the t-test results
+  cat("Paired t-test results:\n")
+  cat("======================================\n")
+  cat("Mean NPP before regime shift:", mean(npp_before), "\n")
+  cat("Mean NPP after regime shift:", mean(npp_after), "\n")
+  cat("\n")
+  cat("t-statistic:", t_test_result$statistic, "\n")
+  cat("Degrees of freedom:", t_test_result$parameter, "\n")
+  cat("p-value:", t_test_result$p.value, "\n")
+  cat("======================================\n")
+  
+  # Interpret the p-value to determine statistical significance
+  if (t_test_result$p.value < 0.05) {
+    cat("The difference in NPP before and after regime shifts is statistically significant (p < 0.05).\n")
+  } else {
+    cat("There is no statistically significant difference in NPP before and after regime shifts (p >= 0.05).\n")
+  }
+}
