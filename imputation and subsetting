@@ -1,0 +1,73 @@
+# Load required library
+library(mice)
+
+# Read the CSV file
+data <- read.csv("E:/SHLD/NPP data/GLODAPv2.2023_Merged_Master_File.csv")
+
+# Replace -9999 with NA for multiple columns
+columns_to_impute <- c('G2nitrite','G2oxygen','G2don', 'G2silicate',
+                       'G2phosphate', 'G2tco2', 'G2talk', 'G2fco2', 'G2doc', 'G2toc','G2nitrate')
+
+for (col in columns_to_impute) {
+  data[[col]][data[[col]] == -9999] <- NA
+}
+
+# Create a copy of the selected columns with a dummy column
+data_temp <- data.frame(data[columns_to_impute], Dummy_Column = 1)
+
+# Create a mice object for imputation
+imputation_model <- mice(data_temp, method = 'pmm')
+
+# Perform imputation for the selected columns
+imputed_data <- complete(imputation_model)
+
+# Extract the imputed columns and remove the dummy column
+imputed_columns <- imputed_data[columns_to_impute]
+imputed_data <- imputed_data[, -which(names(imputed_data) == "Dummy_Column")]
+
+# Display basic information about missing values after imputation
+print("Missing values in imputed columns after imputation:")
+print(colSums(is.na(imputed_columns)))
+
+# Save the imputed data back to CSV if needed
+write.csv(imputed_columns, file = "E:/SHLD/NPP data/imputed_data_global.csv", row.names = FALSE)
+
+
+
+# Read the original data with G2latitude and G2longitude columns
+original_data <- read.csv("E:/SHLD/NPP data/GLODAPv2.2023_Merged_Master_File.csv")
+
+# Combine G2latitude, G2longitude with imputed columns using row index
+combined_data <- cbind(original_data[, c("G2latitude", "G2longitude","G2year","G2month")], imputed_columns)
+
+# Save the combined dataset to a new CSV file
+write.csv(combined_data, file = "E:/SHLD/NPP data/combined_data_global.csv", row.names = FALSE)
+
+
+
+# Read the original dataset
+original_data <- read.csv("E:/SHLD/NPP data/combined_data_global.csv")
+
+# Define the latitude and longitude ranges
+min_lat <- -69.207
+max_lat <- 37.692
+min_lon <- 8.092
+max_lon <- 174.02
+
+# Filter the dataset based on latitude and longitude ranges
+subset_data <- original_data[original_data$G2latitude >= min_lat &
+                               original_data$G2latitude <= max_lat &
+                               original_data$G2longitude >= min_lon &
+                               original_data$G2longitude <= max_lon, ]
+
+# Save the subset dataset to a new CSV file
+write.csv(subset_data, file = "E:/SHLD/NPP data/Indian_ocean_data.csv", row.names = FALSE)
+
+# Read the original dataset
+original_data <- read.csv("E:/SHLD/NPP data/Indian_ocean_data.csv")
+
+# Filter the dataset for the year 2003
+subset_2003 <- subset(original_data, G2year == 2003)  # Replace 'Year' with your actual column name
+
+# Save the subset dataset for 2003 to a new CSV file
+write.csv(subset_2003, file = "E:/SHLD/NPP data/Indian_ocean_2003.csv", row.names = FALSE)
