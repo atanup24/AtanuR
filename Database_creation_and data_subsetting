@@ -1,0 +1,29 @@
+# Read the text file
+vgpm.2021335 <- read.csv("E:/SHLD/VGPM dataset/VGPM_data/2021/vgpm.2021335.txt", sep="")
+data<-vgpm.2021335
+# Remove rows containing any NA (blank cells)
+data_without_blanks <- na.omit(data)
+
+# Write the cleaned dataset to a CSV file
+write.csv(data_without_blanks, file = "E:/SHLD/VGPM dataset/VGPM_data/2021/vgpm_2021335.csv", 
+          row.names = FALSE)
+
+
+# Read the original dataset
+original_data <- read.csv("E:/SHLD/VGPM dataset/VGPM_data/2021/vgpm_2021001.csv")
+
+# Define the latitude and longitude ranges
+min_lat <- -69.207
+max_lat <- 37.692
+min_lon <- 8.092
+max_lon <- 174.02
+
+# Filter the dataset based on latitude and longitude ranges
+subset_data <- original_data[original_data$lat >= min_lat &
+                               original_data$lat <= max_lat &
+                               original_data$lon >= min_lon &
+                               original_data$lon <= max_lon, ]
+
+# Save the subset dataset to a new CSV file
+write.csv(subset_data, file = "E:/SHLD/VGPM dataset/VGPM_data/2021/Indian_ocean_jan_data.csv", 
+          row.names = FALSE)
