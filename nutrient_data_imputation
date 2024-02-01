@@ -1,0 +1,22 @@
+# Install and load necessary packages
+install.packages("mice")
+library(mice)
+
+# Read the dataset from the CSV file
+data <- read.csv("E:/SHLD/NPP data/VGPM_data/CSV_file/Indian_ocean_nutrient.csv")
+
+# Assuming your dataset has columns named G2nitrate, G2nitrite, G2silicate, G2phosphate
+
+# Create a mice imputation object
+imputed_data <- mice(data, method = "pmm")
+# Create a mice imputation object using the "rf" (random forest) method
+imputed_data_rf <- mice(data, method = "rf")
+
+# Generate completed datasets
+completed_data_rf <- complete(imputed_data_rf)
+
+# Specify the file path where you want to save the completed dataset
+output_file_rf <- "E:/SHLD/NPP data/VGPM_data/CSV_file/Indian_ocean_imputed_nutrient.csv"
+
+# Save the completed dataset with imputed missing values using the "random forest" method to a CSV file
+write.csv(completed_data_rf, file = output_file_rf, row.names = FALSE)
