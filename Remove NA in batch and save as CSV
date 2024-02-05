@@ -1,0 +1,42 @@
+library(readr)
+
+# Define the folder path containing the .txt files
+folder_path <- "E:/SHLD/NPP data/VGPM_data/2021/"
+
+# Get the list of .txt files in the folder
+txt_files <- list.files(path = folder_path, pattern = "\\.txt$", full.names = TRUE)
+
+# Create a vector of month names
+months <- c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December")
+
+# Function to read and clean data from a single file
+clean_and_save <- function(file_path, month_name) {
+  cat("Processing file:", file_path, "\n")
+  # Load dataset from current .txt file
+  data <- read.csv(file_path, sep = "\t", header = TRUE)
+  
+  # Check if the number of columns is not equal to 3
+  if (ncol(data) != 3) {
+    warning("Skipping file ", file_path, " due to inconsistent data structure.")
+    return(NULL)
+  }
+  
+  # Remove NA values
+  cleaned_data <- na.omit(data)
+  
+  # Define the filename for the CSV file
+  csv_file_name <- paste0(month_name, ".csv")
+  
+  # Save cleaned dataset as CSV file
+  write.csv(cleaned_data, file.path(folder_path, csv_file_name), row.names = FALSE)
+  cat("File", csv_file_name, "saved successfully.\n")
+}
+
+# Loop through each .txt file
+for (i in seq_along(txt_files)) {
+  # Extract the month name from the file path
+  month_name <- months[i]
+  
+  # Call the clean_and_save function for each file
+  clean_and_save(txt_files[i], month_name)
+}
