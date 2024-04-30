@@ -1,0 +1,17 @@
+# Read the CSV file
+data <- read.csv("E:/SHLD/NPP data/NPP data/NPP/normalized_dataset.csv")
+data<- mx_min
+# Perform min-max normalization function
+min_max_normalize <- function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}
+
+# Apply min-max normalization to each column
+normalized_data <- as.data.frame(lapply(data, min_max_normalize))
+
+# Print the normalized data
+print(normalized_data)
+
+# Save the normalized dataset to a CSV file
+write.csv(normalized_data, file = "E:/SHLD/NPP data/NPP data/NPP/imputed_datset_1.csv",
+          row.names = FALSE)
