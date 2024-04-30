@@ -1,0 +1,56 @@
+# Load required libraries
+library(deSolve)
+library(ggplot2)
+
+# Load NPP dataset
+npp_data <- read.csv("NPP.csv")  # Replace 'NPP.csv' with the path to your NPP dataset
+
+# Extract data
+time <- npp_data$Year + (npp_data$Month - 1) / 12
+npp_values <- npp_data$NPP
+
+# Define initial concentrations of nutrients (Nitrite, Nitrate, Silicate, Phosphate)
+initial_concentrations <- c(Nitrite = 0.004565217, Nitrate = 0.016200876, Silicate = 6.897777778, Phosphate = 0.826666667)
+
+# Define uptake rates for each nutrient
+uptake_rates <- c(Nitrite = -0.001167, Nitrate = 0.104615, Silicate = 0.352536, Phosphate = 0.006389)
+
+# Define nutrient dynamics function
+nutrient_dynamics <- function(time, state, parameters) {
+  with(as.list(c(state, parameters)), {
+    dNitrite <- -parameters["uptake_rate_Nitrite"] * Nitrite + approx(time, npp_values, time)$y
+    dNitrate <- -parameters["uptake_rate_Nitrate"] * Nitrate + approx(time, npp_values, time)$y
+    dSilicate <- -parameters["uptake_rate_Silicate"] * Silicate + approx(time, npp_values, time)$y
+    dPhosphate <- -parameters["uptake_rate_Phosphate"] * Phosphate + approx(time, npp_values, time)$y
+    
+    return(list(c(dNitrite, dNitrate, dSilicate, dPhosphate)))
+  })
+}
+
+# Define parameters
+parameters <- c(uptake_rate_Nitrite = uptake_rates["Nitrite"],
+                uptake_rate_Nitrate = uptake_rates["Nitrate"],
+                uptake_rate_Silicate = uptake_rates["Silicate"],
+                uptake_rate_Phosphate = uptake_rates["Phosphate"])
+
+# Define time span
+t_span <- range(time)
+
+# Solve ODEs
+solution <- ode(y = initial_concentrations, 
+                times = time,
+                func = nutrient_dynamics, 
+                parms = parameters)
+
+# Convert solution to data frame
+df <- as.data.frame(solution)
+
+# Plot concentrations over time
+ggplot(df, aes(x = time)) +
+  geom_line(aes(y = Nitrite), color = "blue", size = 1) +
+  geom_line(aes(y = Nitrate), color = "red", size = 1) +
+  geom_line(aes(y = Silicate), color = "green", size = 1) +
+  geom_line(aes(y = Phosphate), color = "orange", size = 1) +
+  labs(x = "Time", y = "Concentration") +
+  ggtitle("Nutrient Dynamics Over Time") +
+  theme_minimal()
