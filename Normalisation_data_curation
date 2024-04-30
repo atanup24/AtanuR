@@ -1,0 +1,103 @@
+# Install and load necessary packages
+install.packages("mice")
+library(mice)
+
+# Load your dataset
+data <- read.csv("E:/SHLD/NPP data/NPP data/NPP/normalized_dataset.csv")
+
+# Select only the NPP column for imputation
+data_npp <- data["NPP"]
+
+# Perform multiple imputation
+imputed_data <- mice(data_npp, method = "pmm", m = 5)  # Method "pmm" stands for predictive mean matching, m = 5 specifies 5 imputed datasets
+
+# Get the completed datasets
+completed_data <- complete(imputed_data)
+
+# Combine imputed NPP column with original Year and Month columns
+imputed_dataset <- cbind(data[c("Year", "Month")], completed_data$NPP)
+
+# Save the imputed dataset
+write.csv(imputed_dataset, file = "E:/SHLD/NPP data/NPP data/NPP/imputed_dataset.csv", row.names = FALSE)
+
+# Perform multiple imputation
+imputed_data <- mice(data, method = "pmm", m = 5)  # Method "pmm" stands for predictive mean matching, m = 5 specifies 5 imputed datasets
+
+# Get the completed datasets
+completed_data <- complete(imputed_data)
+
+# Save the imputed dataset
+write.csv(completed_data, file = "E:/SHLD/NPP data/NPP data/NPP/imputed_dataset.csv", row.names = FALSE)
+
+data <- read.csv("E:/SHLD/NPP data/NPP data/NPP/normalized_dataset.csv")
+
+# Extract the NPP column
+npp <- data$NPP
+
+# Check for missing values
+if (any(is.na(npp))) {
+  # Handle missing values by imputing them with the mean
+  npp[is.na(npp)] <- mean(npp, na.rm = TRUE)
+}
+
+# Perform Min-Max normalization
+min_npp <- min(npp)
+max_npp <- max(npp)
+normalized_npp <- (npp - min_npp) / (max_npp - min_npp)
+
+# Replace the NPP column with the normalized values
+data$NPP <- normalized_npp
+
+# Save the normalized dataset
+write.csv(data, file = "E:/SHLD/NPP data/NPP data/NPP/imputed_datset_1.csv", 
+          row.names = FALSE)
+
+
+
+
+# Load your dataset
+data <- read.csv("E:/Atanu Kumar Panja/python/CO2_emmission_raw_data.csv")
+
+# Extract the columns representing different years
+year_2017 <- data$Year.2017
+year_2018 <- data$Year.2018
+year_2019 <- data$Year.2019
+year_2020 <- data$Year.2020
+year_2021 <- data$Year.2021
+year_2022 <- data$Year.2022
+
+# Perform Min-Max normalization for each year separately
+min_year_2017 <- min(year_2017)
+max_year_2017 <- max(year_2017)
+normalized_year_2017 <- (year_2017 - min_year_2017) / (max_year_2017 - min_year_2017)
+
+min_year_2018 <- min(year_2018)
+max_year_2018 <- max(year_2018)
+normalized_year_2018 <- (year_2018 - min_year_2018) / (max_year_2018 - min_year_2018)
+
+min_year_2019 <- min(year_2019)
+max_year_2019 <- max(year_2019)
+normalized_year_2019 <- (year_2019 - min_year_2019) / (max_year_2019 - min_year_2019)
+
+min_year_2020 <- min(year_2020)
+max_year_2020 <- max(year_2020)
+normalized_year_2020 <- (year_2020 - min_year_2020) / (max_year_2020 - min_year_2020)
+
+min_year_2021 <- min(year_2021)
+max_year_2021 <- max(year_2021)
+normalized_year_2021 <- (year_2021 - min_year_2021) / (max_year_2021 - min_year_2021)
+
+min_year_2022 <- min(year_2022)
+max_year_2022 <- max(year_2022)
+normalized_year_2022 <- (year_2022 - min_year_2022) / (max_year_2022 - min_year_2022)
+
+# Replace the original columns with the normalized values
+data$Year.2017 <- normalized_year_2017
+data$Year.2018 <- normalized_year_2018
+data$Year.2019 <- normalized_year_2019
+data$Year.2020 <- normalized_year_2020
+data$Year.2021 <- normalized_year_2021
+data$Year.2022 <- normalized_year_2022
+
+# Save the normalized dataset
+write.csv(data, file = "E:/Atanu Kumar Panja/python/CO2_normalized_dataset.csv", row.names = FALSE)
