@@ -1,0 +1,17 @@
+# Create a dataframe with the provided dataset
+data <- data.frame(CV = c(0, 12.79341149, 35.19328272, 72.68557019),
+                   CCM = c(0, 40.16596855, 73.51142022, NA))
+
+# Remove rows with missing values
+data <- na.omit(data)
+
+# Perform two-sample t-test
+t_test_result <- t.test(data$CV, data$CCM)
+
+# Print the t-test result
+print(t_test_result)
+
+# Plot the data along with confidence intervals
+boxplot(data, names = c("CV", "CCM"), col = c("blue", "red"), main = "Boxplot of CV and CCM")
+abline(h = t_test_result$conf.int, col = c("blue", "red"), lty = 2)
+legend("topright", legend = c("CV", "CCM"), fill = c("blue", "red"))
