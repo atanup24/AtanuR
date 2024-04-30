@@ -1,0 +1,182 @@
+# Read the dataset from CSV
+my_data <- read.csv("E:/SHLD/GLODAP/GLODAPv2.2023_Merged_Master_File.csv")
+
+# Set the seed for reproducibility
+set.seed(123)
+
+# Generate a vector of indices for the dataset
+indices <- 1:nrow(my_data)
+
+# Shuffle the indices
+shuffled_indices <- sample(indices)
+
+# Calculate the sizes of each part (e.g., 60%, 20%, 20%)
+n <- length(shuffled_indices)
+part1_size <- round(0.6 * n)
+part2_size <- round(0.2 * n)
+part3_size <- n - part1_size - part2_size
+
+# Split the shuffled indices into three parts
+part1_indices <- shuffled_indices[1:part1_size]
+part2_indices <- shuffled_indices[(part1_size + 1):(part1_size + part2_size)]
+part3_indices <- shuffled_indices[(part1_size + part2_size + 1):n]
+
+# Extract the corresponding rows from the dataset
+part1 <- my_data[part1_indices, ]
+part2 <- my_data[part2_indices, ]
+part3 <- my_data[part3_indices, ]
+
+# Write each part to a separate CSV file
+write.csv(part1, "E:/SHLD/GLODAP/GLODAPv2_part1.csv", row.names = FALSE)
+write.csv(part2, "E:/SHLD/GLODAP/GLODAPv2_part2.csv", row.names = FALSE)
+write.csv(part3, "E:/SHLD/GLODAP/GLODAPv2_part3.csv", row.names = FALSE)
+
+
+# Load required libraries
+library(readr)
+library(dplyr)
+
+# Read the CSV dataset
+df <- read_csv("E:/SHLD/GLODAP/GLODAPv2.2023_Merged_Master_File.csv")
+
+# Selecting specific columns
+selected_columns <- c('G2year', 'G2month', 'G2latitude', 'G2longitude', 'G2temperature', 'G2salinity',
+                      'G2phts25p0', 'G2oxygen', 'G2nitrate', 'G2nitrite', 'G2silicate', 'G2phosphate',
+                      'G2tco2', 'G2talk', 'G2fco2', 'G2toc', 'G2doc', 'G2don')
+
+# Creating a new dataset with selected columns
+new_df <- df %>% select(all_of(selected_columns))
+
+# Saving the new dataset to a new CSV file
+write_csv(new_df, "E:/SHLD/GLODAP/GLODAPv2_new_dataset.csv")
+
+
+# Load required libraries
+library(readr)
+library(dplyr)
+
+# Read the CSV dataset
+df <- read_csv("E:/SHLD/GLODAP/GLODAPv2_new_dataset.csv")
+
+# Filter out rows with -9999 values
+df_filtered <- df %>% filter_all(all_vars(. != -9999))
+
+# Selecting specific columns
+selected_columns <- c('G2year', 'G2month', 'G2latitude', 'G2longitude', 'G2temperature', 'G2salinity',
+                      'G2phts25p0', 'G2oxygen', 'G2nitrate', 'G2nitrite', 'G2silicate', 'G2phosphate',
+                      'G2tco2', 'G2talk', 'G2fco2', 'G2toc', 'G2doc', 'G2don')
+
+# Creating a new dataset with selected columns
+new_df <- df_filtered %>% select(all_of(selected_columns))
+
+# Saving the new dataset to a new CSV file
+write_csv(new_df, "E:/SHLD/GLODAP/GLODAPv2_modified_dataset.csv")
+
+
+
+# Load required libraries
+library(readr)
+library(dplyr)
+library(mice)
+
+# Read the CSV dataset
+df <- read_csv("E:/SHLD/GLODAP/GLODAPv2_new_dataset.csv")
+
+# Replace -9999 with NA
+df[df == -9999] <- NA
+
+# Impute missing values using mice package
+imputed_df <- mice(df, method = "pmm")
+
+# Complete the imputation process
+completed_df <- complete(imputed_df)
+
+# Selecting specific columns
+selected_columns <- c('G2year', 'G2month', 'G2latitude', 'G2longitude', 'G2temperature', 'G2salinity',
+                      'G2phts25p0', 'G2oxygen', 'G2nitrate', 'G2nitrite', 'G2silicate', 'G2phosphate',
+                      'G2tco2', 'G2talk', 'G2fco2', 'G2toc', 'G2doc', 'G2don')
+
+# Creating a new dataset with selected columns
+new_df <- completed_df %>% select(all_of(selected_columns))
+
+# Saving the new dataset to a new CSV file
+write_csv(new_df, "E:/SHLD/GLODAP/GLODAPv2_imputed_dataset.csv")
+
+# Arrange the dataset by G2year
+arranged_df <- completed_df %>% 
+  select(all_of(selected_columns)) %>%
+  arrange(G2year)
+
+# Saving the new dataset to a new CSV file
+write_csv(arranged_df, "E:/SHLD/GLODAP/GLODAPv2_arranged_dataset.csv")
+
+# Read the CSV dataset
+df <- read_csv("E:/SHLD/GLODAP/GLODAPv2_arranged_dataset.csv")
+
+# Extract the G2year column
+G2year_column <- df$G2year
+
+# Find the range of G2year values
+year_range <- range(G2year_column)
+
+# Print the range
+print(year_range)
+
+# Filter dataset for years 2017 to 2021
+filtered_df <- df %>%
+  filter(G2year >= 2017 & G2year <= 2021)
+
+# Selecting specific columns
+selected_columns <- c('G2year', 'G2month', 'G2latitude', 'G2longitude', 'G2temperature', 'G2salinity',
+                      'G2phts25p0', 'G2oxygen', 'G2nitrate', 'G2nitrite', 'G2silicate', 'G2phosphate',
+                      'G2tco2', 'G2talk', 'G2fco2', 'G2toc', 'G2doc', 'G2don')
+
+# Creating a new dataset with selected columns
+new_df <- filtered_df %>% 
+  select(all_of(selected_columns))
+
+# Saving the new dataset to a new CSV file
+write_csv(new_df, "E:/SHLD/GLODAP/GLODAPv2_filtered_dataset_2017_2021.csv")
+
+library(lubridate)
+df <- read_csv("E:/SHLD/GLODAP/GLODAPv2_filtered_dataset_2017_2021.csv")
+# Extract year and month from date
+df$Date <- as.Date(paste(df$G2year, df$G2month, "01", sep = "-"))
+df <- df %>%
+  select(-c(G2year, G2month, G2latitude, G2longitude))
+
+# Group by year and month and calculate monthly average for each variable
+monthly_avg_df <- df %>%
+  group_by(Date) %>%
+  summarise_all(mean, na.rm = TRUE) %>%
+  mutate(G2year = year(Date),
+         G2month = month(Date),
+         G2day = 1) %>%
+  select(G2year, G2month, G2day, everything()) %>%
+  arrange(G2year, G2month)
+
+# Saving the new dataset to a new CSV file
+
+# Saving the new dataset to a new CSV file
+write_csv(monthly_avg_df, "E:/SHLD/GLODAP/GLODAPv2_monthly_average_dataset.csv")
+
+
+df <- read_csv("E:/SHLD/GLODAP/GLODAPv2_filtered_dataset_2017_2021.csv")
+
+# Group by month and calculate average latitude and longitude
+monthly_avg_coords <- df %>%
+  group_by(G2year, G2month) %>%
+  summarise(avg_latitude = mean(G2latitude, na.rm = TRUE),
+            avg_longitude = mean(G2longitude, na.rm = TRUE))
+
+# Join the average coordinates back to the original dataset
+df <- left_join(df, monthly_avg_coords, by = c("G2year", "G2month"))
+
+# Remove original latitude and longitude columns
+df <- df %>%
+  select(-c(G2latitude, G2longitude))
+
+# Saving the new dataset to a new CSV file
+write_csv(df, "E:/SHLD/GLODAP/GLODAPv2_monthly_average_dataset_with_uniform_coords.csv")
+
+
