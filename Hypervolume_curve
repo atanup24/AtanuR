@@ -1,0 +1,228 @@
+# Load necessary libraries
+library(ggplot2)  # For data visualization
+library(dplyr)    # For data manipulation
+library(caret)    # For model training and evaluation
+
+# Load your dataset (replace 'your_dataset.csv' with the actual filename)
+data <- read.csv("Kavi.csv")
+
+# Data exploration
+summary(data)
+str(data)
+cor(data)  # Check correlations between variables
+
+
+# Load necessary libraries
+library(dplyr)  # For data manipulation
+library(ggplot2)  # For visualization
+
+# Create a dataframe with the provided data
+df <- data.frame(
+  Strata = c("U", "M", "L", "U", "M", "L", "U", "M", "L", "U", "M", "L", "U", "M", "L"),
+  Polychaete = c(15, 0, 0, 13, 7, 0, 29, 1, 0, 14, 8, 1, 17, 5, 2),
+  Station = rep(c("A", "B", "C"), each = 5)
+)
+
+# Data exploration
+summary(df)
+str(df)
+
+# Visualization: Boxplot of Polychaete abundance by Strata and Station
+ggplot(df, aes(x = Strata, y = Polychaete, fill = Station)) +
+  geom_boxplot() +
+  labs(title = "Polychaete Abundance by Strata and Station", x = "Strata",
+       y = "Polychaete Abundance", fill = "Station")
+# Model fitting
+model <- lm(Polychaete ~ Strata + Station, data = df)
+
+# Model summary
+summary(model)
+
+
+# Load necessary packages
+install.packages("hypervolume")
+library(hypervolume)
+
+# Assuming your dataset is named "your_dataset"
+your_dataset <- read.csv("Kavi.csv")
+# Replace "your_dataset" with the name of your actual dataset
+
+# Create hypervolume object for each stratum
+strata_U <- subset(your_dataset, Strata == "U", select = c("Polychaete"))
+strata_M <- subset(your_dataset, Strata == "M", select = c("Polychaete"))
+strata_L <- subset(your_dataset, Strata == "L", select = c("Polychaete"))
+
+# Combine data frames to create a list of numeric matrices
+data_list <- list(strata_U, strata_M, strata_L)
+
+# Convert data frames to numeric matrices
+for (i in seq_along(data_list)) {
+  data_list[[i]] <- as.matrix(data_list[[i]])
+}
+
+# Create hypervolume object
+hv <- hypervolume(data_list)
+
+# Plot hypervolume niche
+plot(hv, col = c("red", "green", "blue"), alpha = 0.5, legend = TRUE)
+
+# Plot distribution of Polychaete for each stratum
+ggplot(your_dataset, aes(x = Strata, y = Polychaete, fill = Strata)) +
+  geom_boxplot() +
+  labs(title = "Polychaete Distribution Across Strata", x = "Strata", y = "Polychaete") +
+  theme_minimal()
+
+
+
+
+
+
+library(hypervolume)
+
+# Read the dataset
+data <- read.csv("Kavi.csv")  # Replace "your_dataset.csv" with the actual path to your dataset
+
+# Convert 'Height' variable to numeric
+
+# View the structure of the dataset
+str(data)
+
+# Clean the "Height" variable
+data$Height_cleaned <- gsub(" cm", "", data$Height)
+
+# Split the range and calculate the average
+data$Height_numeric <- sapply(strsplit(data$Height_cleaned, "-"), 
+                              function(x) mean(as.numeric(x)))
+# Print the first few rows of the transformed dataset
+head(data)
+
+# Assuming the 'Height' variable represents the height range of the Polychaete
+# You may need to adjust this conversion based on the actual values in your dataset
+data$Height <- as.numeric(gsub(" cm", "", data$Height))
+
+# Create data frames for each stratum and dimension
+strata_U <- subset(data, Strata == "U", select = c("Polychaete", "Height"))
+strata_M <- subset(data, Strata == "M", select = c("Polychaete", "Height"))
+strata_L <- subset(data, Strata == "L", select = c("Polychaete", "Height"))
+
+# Combine data frames to create a list of numeric matrices
+data_list <- list(strata_U, strata_M, strata_L)
+
+# Convert data frames to numeric matrices
+for (i in seq_along(data_list)) {
+  data_list[[i]] <- as.matrix(data_list[[i]])
+}
+
+# Create hypervolume object
+hv <- hypervolume(data_list)
+
+# Plot hypervolume niche
+plot(hv, col = c("red", "green", "blue"), alpha = 0.5, legend = TRUE)
+
+
+
+
+
+# Sample data
+data <- data.frame(
+  Height = c("0-4 cm", "04-08 cm", "08-10 cm",
+             "0-4 cm", "04-08 cm", "08-10 cm",
+             "0-4 cm", "04-08 cm", "08-10 cm",
+             "0-4 cm", "04-08 cm", "08-10 cm",
+             "0-4 cm", "04-08 cm", "08-10 cm")
+)
+
+# Remove " cm" suffix
+data$Height_cleaned <- gsub(" cm", "", data$Height)
+
+# Split the range and calculate the average
+data$Height_numeric <- sapply(strsplit(data$Height_cleaned, "-"), 
+                              function(x) mean(as.numeric(x)))
+
+# Print the result
+print(data)
+
+
+
+
+
+
+
+
+
+
+library(hypervolume)
+
+# Read the modified dataset from the CSV file
+data <- read.csv("modified_dataset.csv")
+
+# Convert 'Height_numeric' variable to numeric (if not already)
+data$Height_numeric <- as.numeric(data$Height_numeric)
+
+# Create data frames for each stratum and dimension
+strata_U <- subset(data, Strata == "U", select = c("Polychaete", "Height_numeric"))
+strata_M <- subset(data, Strata == "M", select = c("Polychaete", "Height_numeric"))
+strata_L <- subset(data, Strata == "L", select = c("Polychaete", "Height_numeric"))
+
+# Combine data frames to create a list of numeric matrices
+data_list <- list(strata_U, strata_M, strata_L)
+
+# Convert data frames to numeric matrices
+for (i in seq_along(data_list)) {
+  data_list[[i]] <- as.matrix(data_list[[i]])
+}
+
+# Create hypervolume object
+hv <- hypervolume(data_list)
+
+# Plot hypervolume niche
+plot(hv, col = c("red", "green", "blue"), alpha = 0.5, legend = TRUE)
+
+
+
+library(hypervolume)
+
+# Read the modified dataset from the CSV file
+data <- read.csv("modified_dataset.csv")
+
+# Convert 'Height_numeric' variable to numeric (if not already)
+data$Height_numeric <- as.numeric(data$Height_numeric)
+
+# Create hypervolume object
+hv <- hypervolume(data[, c("Polychaete", "Height_numeric")])
+
+# Plot hypervolume niche
+plot(hv, col = c("red", "green", "blue"), alpha = 0.5, legend = TRUE)
+
+
+# Load necessary packages
+library(hypervolume)
+library(rgl)
+
+# Read the modified dataset from the CSV file
+data <- read.csv("modified_dataset.csv")
+
+# Convert 'Height_numeric' variable to numeric (if not already)
+data$Height_numeric <- as.numeric(data$Height_numeric)
+
+# Create hypervolume object
+hv <- hypervolume(data[, c("Polychaete", "Height_numeric")])
+
+# Define the number of points to sample
+n_points <- 1000
+
+# Extract the range of each dimension
+min_values <- hv@ranges[, "min"]
+max_values <- hv@ranges[, "max"]
+
+# Generate random points within the range of each dimension
+random_points <- matrix(runif(n_points * length(min_values), min = min_values,
+                              max = max_values), ncol = length(min_values))
+
+# Open 3D plot device
+open3d()
+
+# Plot 3D scatterplot
+plot3d(random_points[, 1], random_points[, 2], random_points[, 3], 
+       col = "blue", size = 3, type = "s", xlab = "Polychaete", ylab = "Height_numeric",
+       zlab = "Z", main = "Hypervolume Plot")
