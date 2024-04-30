@@ -1,0 +1,48 @@
+# Install and load necessary packages
+install.packages("reshape2")
+library(reshape2)
+
+# Data
+sites <- c('Site 1', 'Site 1', 'Site 1', 'Site2', 'Site2', 'Site2', 'Site2', 'Site2', 'Site3', 'Site3', 'Site3', 'Site3', 'Site3')
+categories <- c('U', 'M', 'L')
+values <- matrix(c(
+  1250, 0, 0,
+  1375, 375, 0,
+  2750, 0, 0,
+  1875, 0, 0,
+  1625, 875, 0,
+  3625, 125, 0,
+  1750, 0, 0,
+  1875, 0, 0,
+  0, 0, 3250,
+  0, 0, 0,
+  0, 375, 0,
+  0, 0, 625,
+  0, 625, 0
+), ncol = 3, byrow = TRUE)
+
+# Convert data to a data frame
+data <- data.frame(sites, values)
+colnames(data)[2:4] <- categories
+
+# Melt the data for plotting
+melted_data <- melt(data, id.vars = 'sites')
+
+# Create clustered barplot
+barplot(melted_data$value, beside = TRUE, col = rainbow(length(unique(melted_data$sites))), 
+        names.arg = unique(melted_data$sites), xlab = 'Sites', ylab = 'Values', 
+        main = 'Clustered Barplot')
+
+# Create legend manually
+legend("topright", legend = unique(melted_data$variable), fill = rainbow(length(unique(melted_data$variable))))
+
+# Add axis titles
+title(main = "Clustered Barplot", xlab = "Sites", ylab = "De")
+
+# Add axis lines and ticks
+axis(1, at = seq(1, length(unique(melted_data$sites))), labels = unique(melted_data$sites))
+axis(2, las = 1)
+
+
+
+
