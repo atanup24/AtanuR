@@ -1,0 +1,14 @@
+# Load the dataset from CSV
+df <- read.csv("phytoplankton_data_with_growth_rate.csv")
+
+# Function to perform min-max normalization
+min_max_normalization <- function(data) {
+  return((data - min(data)) / (max(data) - min(data)))
+}
+
+# Apply min-max normalization to each numeric column
+numeric_columns <- sapply(df, is.numeric)
+df[, numeric_columns] <- lapply(df[, numeric_columns], min_max_normalization)
+
+# Save the normalized dataset to a new CSV file
+write.csv(df, file = "normalized_dataset.csv", row.names = FALSE)
