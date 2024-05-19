@@ -1,0 +1,28 @@
+# Install and load necessary libraries
+install.packages("FactoMineR")
+install.packages("factoextra")
+library(FactoMineR)
+library(factoextra)
+
+# Prepare data and perform PCA
+df <- iris[, -5]  # Exclude species column for PCA
+species <- iris$Species  # Save species column separately
+
+# Perform PCA
+pca_result <- PCA(df, scale.unit = TRUE, graph = FALSE)
+
+# Create PCA biplot with ellipses for species
+fviz_pca_biplot(pca_result, 
+                geom.ind = "point", # Show points only (not "text")
+                col.ind = species, # Color by species
+                palette = c("#00AFBB", "#E7B800", "#FC4E07"), # Color palette
+                addEllipses = TRUE, # Add confidence ellipses
+                ellipse.level = 0.95, # Confidence level for ellipses
+                label = "var", # Label variables
+                col.var = "red", # Variables color
+                arrowsize = 1, # Arrow size
+                title = "PCA Biplot with Ellipses") + 
+  theme_minimal() +
+  theme(axis.title = element_text(size = 12), 
+        axis.text = element_text(size = 10),
+        legend.position = "bottom")
