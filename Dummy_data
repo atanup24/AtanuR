@@ -1,0 +1,36 @@
+# Load necessary library
+library(dplyr)
+
+# Assume 'original_data' is your original dataset
+# Shuffle the rows
+set.seed(123) # For reproducibility
+original_data<-read.csv("E:/Sweta_cholera data/completed_dataset_mice.csv")
+shuffled_data <- original_data %>% sample_frac(1)
+
+# Optionally take a subset (e.g., 20 rows)
+dummy_data <- shuffled_data %>% slice(1:20)
+
+# View the dummy dataset
+head(dummy_data)
+# Function to create a dummy dataset
+create_dummy_data <- function(original_data, n) {
+  dummy_data <- original_data[rep(1, n), ] # Replicate the structure of the original data
+  
+  for (col in colnames(dummy_data)) {
+    if (is.numeric(dummy_data[[col]])) {
+      dummy_data[[col]] <- rnorm(n, mean = mean(original_data[[col]], na.rm = TRUE), sd = sd(original_data[[col]], na.rm = TRUE))
+    } else if (is.factor(dummy_data[[col]])) {
+      dummy_data[[col]] <- sample(levels(original_data[[col]]), n, replace = TRUE)
+    } else if (is.character(dummy_data[[col]])) {
+      dummy_data[[col]] <- sample(unique(original_data[[col]]), n, replace = TRUE)
+    }
+  }
+  
+  return(dummy_data)
+}
+
+# Create a dummy dataset with 100 rows
+dummy_data <- create_dummy_data(original_data, 100)
+
+# View the dummy dataset
+head(dummy_data)
