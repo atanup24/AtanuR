@@ -1,0 +1,12 @@
+# Prepare your data (excluding the species column)
+data(iris)
+iris_data <- iris[, -5]
+
+# Perform PCA
+pca_result <- PCA(iris_data, graph = FALSE)
+
+# Create the PCA biplot
+fviz_pca_var(pca_result,
+             col.var = "red", # Color by cos2 values
+             repel = TRUE     # Avoid text overlapping
+)
