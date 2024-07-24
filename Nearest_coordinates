@@ -1,0 +1,51 @@
+# Load necessary libraries
+library(geosphere)
+library(dplyr)
+
+# Read the main dataset CSV file containing coordinates
+main_data <- read.csv("E:/SHLD/NPP data/NPP data/NPP/2003/vgpm.2003335.all.csv")
+
+# Read the target coordinates CSV file
+target_coords <- read.csv("E:/SHLD/Ecotone/location_NPP.csv")
+
+# Ensure main_data and target_coords have valid coordinate columns
+if (!all(c("Latitude", "Longitude") %in% colnames(main_data)) ||
+    !all(c("Latitude", "Longitude") %in% colnames(target_coords))) {
+  stop("Both datasets must contain 'Latitude' and 'Longitude' columns.")
+}
+
+# Function to find the nearest coordinate
+find_nearest <- function(lat, lon, data) {
+  # Filter out rows with invalid latitude or longitude
+  valid_data <- data %>%
+    filter(Latitude >= -90 & Latitude <= 90 & Longitude >= -180 & Longitude <= 180)
+  
+  # Calculate distances
+  distances <- distVincentySphere(
+    cbind(valid_data$Longitude, valid_data$Latitude),
+    c(lon, lat)
+  )
+  
+  nearest_index <- which.min(distances)
+  nearest <- valid_data[nearest_index, ]
+  return(nearest)
+}
+
+# Apply the function to each target coordinate and store results
+nearest_coords <- target_coords %>%
+  rowwise() %>%
+  mutate(
+    Nearest_Latitude = find_nearest(Latitude, Longitude, main_data)$Latitude,
+    Nearest_Longitude = find_nearest(Latitude, Longitude, main_data)$Longitude,
+    Nearest_Distance = distVincentySphere(
+      c(Nearest_Longitude, Nearest_Latitude),
+      c(Longitude, Latitude)
+    )
+  )
+
+# View the results
+print(nearest_coords)
+
+
+# Optionally, save the results to a CSV file
+write.csv(nearest_coords, "E:/SHLD/Ecotone/nearest_coordinates.csv", row.names = FALSE)
