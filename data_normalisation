@@ -1,0 +1,31 @@
+# Load necessary library
+library(dplyr)
+
+# Load your dataset
+data <- read.csv('E:/SHLD/Moumita/Aquaculture/Species_abundance.csv')
+
+# Select only the relevant columns for normalization (starting from column 3 onwards)
+columns_to_normalize <- colnames(data)[3:ncol(data)]
+
+# Z-score normalization
+z_score_normalized <- data
+z_score_normalized[columns_to_normalize] <- scale(data[columns_to_normalize])
+
+# Min-Max normalization
+min_max_normalized <- data
+min_max_normalized[columns_to_normalize] <- as.data.frame(lapply(data[columns_to_normalize], function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}))
+
+# Log scale normalization
+log_scale_normalized <- data
+log_scale_normalized[columns_to_normalize] <- as.data.frame(lapply(data[columns_to_normalize], function(x) {
+  log1p(x)  # log1p is log(1 + x) to handle zero values
+}))
+
+# Save the normalized datasets to CSV files
+write.csv(z_score_normalized, 'E:/SHLD/Moumita/Aquaculture/z_score_normalized.csv', row.names = FALSE)
+write.csv(min_max_normalized, 'E:/SHLD/Moumita/Aquaculture/min_max_normalized.csv', row.names = FALSE)
+write.csv(log_scale_normalized, 'E:/SHLD/Moumita/Aquaculture/log_scale_normalized.csv', row.names = FALSE)
+
+
