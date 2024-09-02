@@ -1,0 +1,33 @@
+# Load necessary libraries
+library(vegan)
+library(ggplot2)
+
+# Load your data
+data <- read.csv("your_dataset.csv")
+
+# Create a response matrix combining Abundance and Biomass
+response_matrix <- data[, c("Abundance", "Biomass")]
+
+# Perform PERMANOVA
+permanova_result <- adonis2(response_matrix ~ Site * Strata, data = data, permutations = 999)
+
+# Print the PERMANOVA results
+print(permanova_result)
+
+# Perform NMDS
+nmds_result <- metaMDS(response_matrix, distance = "bray", k = 2, trymax = 100)
+
+# Print NMDS results
+print(nmds_result)
+# Extract NMDS coordinates
+nmds_coordinates <- as.data.frame(nmds_result$points)
+nmds_coordinates$Site <- data$Site
+nmds_coordinates$Strata <- data$Strata
+
+# Plot NMDS result
+ggplot(nmds_coordinates, aes(x = MDS1, y = MDS2, color = Site, shape = Strata)) +
+  geom_point(size = 3) +
+  stat_ellipse(type = "norm", level = 0.95) +  # Add ellipses for confidence intervals
+  labs(title = "NMDS Plot of Abundance and Biomass",
+       x = "NMDS1", y = "NMDS2") +
+  theme_minimal()
